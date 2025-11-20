@@ -17,7 +17,31 @@ const __dirname = path.dirname(__filename);
 const PORT = ENV.PORT || 3000;
 
 app.use(express.json({ limit: "5mb" }));
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+
+// CORS Configuration
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://chatify-the-chatting-platform-with.vercel.app'
+];
+
+if (ENV.CLIENT_URL) {
+  allowedOrigins.push(ENV.CLIENT_URL);
+}
+
+app.use(cors({ 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true 
+}));
+
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
