@@ -32,7 +32,7 @@ export const useChatStore = create((set, get) => ({
   getAllContacts: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstance.get("/messages/contacts");
+      const res = await axiosInstance.get("/api/messages/chats");
       // Add AI bot to the beginning of contacts
       set({ allContacts: [AI_BOT, ...res.data] });
     } catch (error) {
@@ -45,7 +45,7 @@ export const useChatStore = create((set, get) => ({
   getMyChatPartners: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstance.get("/messages/chats");
+      const res = await axiosInstance.get("/api/messages/chats");
       set({ chats: res.data });
     } catch (error) {
       toast.error(error.response.data.message);
@@ -59,10 +59,10 @@ export const useChatStore = create((set, get) => ({
     try {
       // Check if user is AI bot
       if (userId === AI_BOT._id) {
-        const res = await axiosInstance.get("/ai/history");
+        const res = await axiosInstance.get("/api/ai/history");
         set({ messages: res.data });
       } else {
-        const res = await axiosInstance.get(`/messages/${userId}`);
+        const res = await axiosInstance.get(`/api/messages/${userId}`);
         set({ messages: res.data });
       }
     } catch (error) {
