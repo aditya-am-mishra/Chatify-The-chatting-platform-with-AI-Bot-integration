@@ -18,25 +18,28 @@ const PORT = ENV.PORT || 3000;
 
 app.use(express.json({ limit: "5mb" }));
 
-// CORS Configuration
+// Simplified CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://chatify-the-chatting-platform-with.vercel.app'
-];
+  'https://chatify-the-chatting-platform-with.vercel.app',
+  ENV.CLIENT_URL
+].filter(Boolean);
 
-if (ENV.CLIENT_URL) {
-  allowedOrigins.push(ENV.CLIENT_URL);
-}
+console.log('Allowed CORS origins:', allowedOrigins); // Debug log
 
 app.use(cors({ 
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.log('CORS blocked origin:', origin); // Debug log
+      callback(null, false); // ← Fixed: don't throw error, just return false
     }
   },
   credentials: true 
